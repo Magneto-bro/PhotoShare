@@ -1,8 +1,6 @@
 from fastapi import FastAPI
+from .routes import photos  
 
 app = FastAPI()
 
-
-@app.get("/api/healthchecker")
-def root():
-    return {"message": "Welcome to FastAPI!"}
+app.include_router(photos.router) 
