@@ -9,6 +9,10 @@ from sqlalchemy.ext.asyncio import (
 
 from src.conf.config import config
 
+from sqlalchemy.orm import DeclarativeBase
+
+class Base(DeclarativeBase):
+    pass
 
 class DatabaseSessionManager:
     def __init__(self, url: str):
