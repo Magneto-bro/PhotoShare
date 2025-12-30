@@ -1,9 +1,14 @@
 # SQLAlchemy-модель для комментариев
 
 from sqlalchemy import Column, Integer, ForeignKey, DateTime, Text
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, DeclarativeBase
 from datetime import datetime
-from src.photoshare.database import Base
+
+
+
+class Base(DeclarativeBase):
+    pass
+
 
 class Comment(Base):
     __tablename__ = "comments"
