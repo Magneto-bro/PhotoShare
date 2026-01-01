@@ -14,6 +14,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
+
 class Base(DeclarativeBase):
     pass
 
@@ -28,6 +29,7 @@ class User(Base):
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True, nullable=False)
     username: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(255), nullable=False)
@@ -41,14 +43,22 @@ class User(Base):
 
     comments: Mapped[list["Comment"]] = relationship("Comment", back_populates="author", cascade="all, delete-orphan")
 
+    is_active: Mapped[bool] = mapped_column(Boolean, default = True)
+    is_banned: Mapped[bool]=mapped_column(Boolean, default = False)
+
+    photos = relationship("Photo")
+
 
 class Photo(Base):
     __tablename__ = "photos"
 
+
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     title: Mapped[str] = mapped_column(String(255), nullable=False)
 
-    comments: Mapped[list["Comment"]] = relationship("Comment", back_populates="photo", cascade="all, delete-orphan")
+    comments: Mapped[list["Comment"]] = relationship(
+        "Comment", back_populates="photo", cascade="all, delete-orphan"
+    )
 
 
 class Comment(Base):
