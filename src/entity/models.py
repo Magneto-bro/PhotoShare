@@ -1,48 +1,66 @@
-# SQLAlchemy-модель для комментариев
-
 from enum import Enum
-from sqlalchemy import Enum as SQLEnum
-from sqlalchemy import Boolean, Column, Integer, ForeignKey, DateTime, String, Text, func
-from sqlalchemy.orm import relationship, DeclarativeBase, Mapped, mapped_column
 from datetime import datetime
 
+from sqlalchemy import (
+    Boolean,
+    DateTime,
+    Enum as SQLEnum,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    func,
+)
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
 class Base(DeclarativeBase):
     pass
 
 
-class Comment(Base):
-    __tablename__ = "comments"
-
-    id = Column(Integer, primary_key=True, index=True)
-    photo_id = Column(Integer, ForeignKey("photos.id"), nullable=False, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
-    content = Column(Text, nullable=False)  # используем Text для длинных комментариев
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
-
-    # связи с другими таблицами
-    photo = relationship("Photo", back_populates="comments")
-    author = relationship("User", back_populates="comments")
-    
-    
 class RoleEnum(str, Enum):
     user = "user"
     moderator = "moderator"
     admin = "admin"
 
+
 class User(Base):
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    email: Mapped[str] = mapped_column(String, unique=True, index=True, nullable=False)
-    username: Mapped[str] = mapped_column(String, unique=True, nullable=False)
-    password: Mapped[str] = mapped_column(String, nullable=False)
+    email: Mapped[str] = mapped_column(String(255), unique=True, index=True, nullable=False)
+    username: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
+    password: Mapped[str] = mapped_column(String(255), nullable=False)
     refresh_token: Mapped[str | None] = mapped_column(String(255), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=func.now())
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime, default=func.now(), onupdate=func.now()
-    )
-    confirmed: Mapped[bool] = mapped_column(Boolean, default=False)
-    role: Mapped[RoleEnum] = mapped_column(SQLEnum(RoleEnum), default=RoleEnum.user)
+
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
+
+    confirmed: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    role: Mapped[RoleEnum] = mapped_column(SQLEnum(RoleEnum, name="role_enum"), default=RoleEnum.user, nullable=False)
+
+    comments: Mapped[list["Comment"]] = relationship("Comment", back_populates="author", cascade="all, delete-orphan")
+
+
+class Photo(Base):
+    __tablename__ = "photos"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+
+    comments: Mapped[list["Comment"]] = relationship("Comment", back_populates="photo", cascade="all, delete-orphan")
+
+
+class Comment(Base):
+    __tablename__ = "comments"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    photo_id: Mapped[int] = mapped_column(ForeignKey("photos.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    content: Mapped[str] = mapped_column(Text, nullable=False)
+
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
+
+    photo: Mapped["Photo"] = relationship("Photo", back_populates="comments")
+    author: Mapped["User"] = relationship("User", back_populates="comments")
