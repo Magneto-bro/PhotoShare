@@ -18,6 +18,18 @@ def create_comment(comment: CommentCreate, db: Session = Depends(get_db), user_i
     db.refresh(new_comment)
     return new_comment
 
+@router.get("/", response_model=list[CommentResponse])
+def get_comments(db: Session = Depends(get_db)):
+    comments = db.query(Comment).all()
+    return comments
+
+@router.get("/{comment_id}", response_model=CommentResponse)
+def get_comment(comment_id: int, db: Session = Depends(get_db)):
+    db_comment = db.query(Comment).filter(Comment.id == comment_id).first()
+    if not db_comment:
+        raise HTTPException(status_code=404, detail="Коментар не знайдено")
+    return db_comment
+
 @router.put("/{comment_id}", response_model=CommentResponse)
 def update_comment(comment_id: int, comment: CommentUpdate, db: Session = Depends(get_db), user_id: int = 1):
     db_comment = db.query(Comment).filter(
