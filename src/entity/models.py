@@ -52,13 +52,22 @@ class User(Base):
 class Photo(Base):
     __tablename__ = "photos"
 
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
     title: Mapped[str] = mapped_column(String(255), nullable=False)
+    description: Mapped[str | None] = mapped_column(Text)
 
-    comments: Mapped[list["Comment"]] = relationship(
-        "Comment", back_populates="photo", cascade="all, delete-orphan"
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True
     )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now()
+    )
+
+    owner: Mapped["User"] = relationship("User", back_populates="photos")
+
 
 
 class Comment(Base):
