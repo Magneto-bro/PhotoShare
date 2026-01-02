@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from src.schemas.photo import PhotoCreate, PhotoResponse, PhotoUpdate
 from src.database.db import get_db
 from src.services.auth import get_current_user
-from src.services.photos import get_owned_photo
+from src.services.photos import assign_tags_to_photo, get_owned_photo
 from src.repository.photos import create_photo, get_photo, update_photo, delete_photo
 
 router = APIRouter(prefix="/photos", tags=["photos"])
@@ -15,7 +15,11 @@ async def upload_photo(
     user=Depends(get_current_user),
     db=Depends(get_db)
 ):
-    return await create_photo(db, data, user.id)
+    photo = await create_photo(db, data, user.id)
+    if data.tags:
+        photo = await assign_tags_to_photo(db, photo, data.tags)
+    return photo
+
 
 
 @router.get("/{photo_id}", response_model=PhotoResponse)

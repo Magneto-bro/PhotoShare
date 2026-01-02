@@ -3,7 +3,7 @@ from src.schemas.photo import PhotoCreate
 
 
 async def create_photo(db, data: PhotoCreate, user_id: int):
-    photo = Photo(**data.model_dump(), owner_id=user_id)
+    photo = Photo(**data.model_dump(), user_id=user_id)
     db.add(photo)
     await db.commit()
     await db.refresh(photo)
