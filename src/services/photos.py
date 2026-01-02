@@ -1,8 +1,9 @@
 from fastapi import HTTPException
 from sqlalchemy import select
 from src.entity.models import RoleEnum, Tag
-from src.repository.photos import get_photo
+from src.repository.photos import create_photo, get_photo
 from src.repository.tags import create_tag, get_tag_by_name
+from src.schemas.photo import PhotoCreate
 
 async def get_owned_photo(db, photo_id: int, user):
     photo = await get_photo(db, photo_id)
@@ -36,3 +37,13 @@ async def assign_tags_to_photo(db, photo, tag_names: list[str]):
     await db.commit()
     await db.refresh(photo)
     return photo
+
+
+async def upload_photo_service(db, data: PhotoCreate, user):
+    photo = await create_photo(db, data, user.id)
+
+    if data.tags:
+        photo = await assign_tags_to_photo(db, photo, data.tags)
+
+    return photo
+
