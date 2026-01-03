@@ -3,8 +3,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database.db import get_db
 from src.repository import photos as repository_photos
-from src.entity.models import Photo
-from src.services.auth import auth_service
 
 router = APIRouter(prefix="/photos", tags=["photos"])
 
