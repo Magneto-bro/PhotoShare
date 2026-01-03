@@ -74,50 +74,43 @@ class Comment(Base):
     photo: Mapped["Photo"] = relationship("Photo", back_populates="comments")
     author: Mapped["User"] = relationship("User", back_populates="comments")
     
-    
-photo_tags_table = Table(
-    "photo_tags",
-    Base.metadata,
-    mapped_column("photo_id", ForeignKey("photos.id", ondelete="CASCADE"), primary_key=True),
-    mapped_column("tag_id", ForeignKey("tags.id", ondelete="CASCADE"), primary_key=True)
-)
-    
+
     
 class Tag(Base):
     __tablename__ = "tags"
-
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
-
-    photos = relationship("Photo", secondary=photo_tags_table, back_populates="tags")
+    photos: Mapped[list["Photo"]] = relationship(
+        "Photo",
+        secondary="photo_tags",
+        back_populates="tags"
+    )
     
 
 class Photo(Base):
     __tablename__ = "photos"
-
-    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str | None] = mapped_column(Text)
-    tags = relationship("Tag", secondary=photo_tags_table, back_populates="photos")
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime, server_default=func.now()
-    )
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     owner: Mapped["User"] = relationship("User", back_populates="photos")
-
-
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime, server_default=func.now()
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
     tags: Mapped[list["Tag"]] = relationship(
         "Tag",
-        secondary=photo_tags_table,
+        secondary="photo_tags",
         back_populates="photos"
     )
-
     comments: Mapped[list["Comment"]] = relationship(
         "Comment",
         back_populates="photo",
         cascade="all, delete-orphan"
     )
+    
+    
+class PhotoTag(Base):
+    __tablename__ = "photo_tags"
+    photo_id: Mapped[int] = mapped_column(ForeignKey("photos.id"), primary_key=True)
+    tag_id: Mapped[int] = mapped_column(ForeignKey("tags.id"), primary_key=True)
+    
+

@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 router = APIRouter(prefix="/users", tags=["users"])
 
-@router.get("/admin-only")
+@router.get("/admin")
 async def admin_panel(user=Depends(role_required(RoleEnum.admin))):
     return {"msg": f"Hello, admin {user.username}!"}
 
