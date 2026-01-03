@@ -8,7 +8,11 @@ class Settings(BaseSettings):
     DB_URL: str = "postgresql+asyncpg://postgres:098765@localhost:5432/abcdef"
     SECRET_KEY_JWT: str = "1234567890"
     ALGORITHM: str = "HS256"
-    
+    MAIL_USERNAME: EmailStr = "postgres@mail.com"
+    MAIL_PASSWORD: str = "postgresmail"
+    MAIL_FROM: str = "your_email@example.com"
+    MAIL_PORT: int = 567234
+    MAIL_SERVER: str = "postgresserver"
 
     
 

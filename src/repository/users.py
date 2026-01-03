@@ -51,6 +51,16 @@ async def update_user(
     await db.refresh(user)
     return user
 
+async def update_token(user: User, token: str | None, db: AsyncSession):
+    user.refresh_token = token
+    await db.commit()
+
+
+async def confirmed_email(email: str, db: AsyncSession) -> None:
+    user = await get_user_by_email(email, db)
+    user.confirmed = True
+    await db.commit()
+
 async def ban_user(user:User,db:AsyncSession):
     user.is_banned=True
     user.is_active =False

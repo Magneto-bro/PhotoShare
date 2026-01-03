@@ -27,7 +27,7 @@ async def update_photo(
     await db.commit()
     await db.refresh(photo)
     return photo
-=======
+
 from src.entity.models import Photo
 from src.schemas.photo import PhotoCreate
 
