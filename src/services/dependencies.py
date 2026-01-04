@@ -12,5 +12,3 @@ def role_required(*roles: RoleEnum):
             )
         return user
     return role_dependency
-
-

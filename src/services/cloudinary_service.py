@@ -12,3 +12,14 @@ cloudinary.config(
 def upload_image(file):
     result = cloudinary.uploader.upload(file)
     return result["secure_url"]
+
+def get_transformed_url(public_id, width=500, height=500, crop="fill"):
+    """
+    Генерує URL для вже завантаженого фото з накладеними трансформаціями.
+    """
+    return cloudinary.CloudinaryImage(public_id).build_url(
+        width=width,
+        height=height,
+        crop=crop,
+        gravity="face" # Автоматично фокусується на обличчі
+    )
