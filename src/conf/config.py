@@ -13,8 +13,10 @@ class Settings(BaseSettings):
     MAIL_FROM: str = "your_email@example.com"
     MAIL_PORT: int = 567234
     MAIL_SERVER: str = "postgresserver"
+    CLOUDINARY_NAME: str
+    CLOUDINARY_API_KEY: str
+    CLOUDINARY_API_SECRET: str
 
-    
 
     model_config = ConfigDict(
         extra="ignore", env_file=".env", env_file_encoding="utf-8"
