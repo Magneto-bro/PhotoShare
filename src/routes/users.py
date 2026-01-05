@@ -16,3 +16,7 @@ router = APIRouter(prefix="/users", tags=["users"])
 async def admin_panel(user=Depends(role_required(RoleEnum.admin))):
     return {"msg": f"Hello, admin {user.username}!"}
 
+
+@router.get("/moderator")
+async def moderator_panel(user=Depends(role_required(RoleEnum.moderator))):
+    return {"msg": f"Hello, moderator {user.username}!"}
